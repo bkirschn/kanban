@@ -21,15 +21,16 @@ public class JiraSyncServlet extends HttpServlet {
    private static final long serialVersionUID = 1L;
    private static Log M_log = LogFactory.getLog(JiraSyncServlet.class);
    private  Properties props = new Properties();
+   String envHome = System.getenv("PROPERTY_HOME");
    
    public JiraSyncServlet() {
       try
       {
-         String propertyHome = System.getenv("PROPERTY_HOME");
-         if ( null == propertyHome )
-            propertyHome = System.getenv("CATALINA_HOME");
+         envHome = System.getenv("PROPERTY_HOME");
+         if ( null == envHome )
+            envHome = System.getenv("CATALINA_HOME");
          
-         FileInputStream fis = new FileInputStream(propertyHome+"/jira.properties");
+         FileInputStream fis = new FileInputStream(envHome+"/jira.properties");
          props.load( fis );
       }
       catch (Exception e)
@@ -56,7 +57,7 @@ public class JiraSyncServlet extends HttpServlet {
             String xsltPath = props.getProperty("xslt.path");
             mergeFiles=xmlMerge.mergeFiles(queryString, 
                                            getServletContext().getRealPath(xsltPath),
-                                           getServletContext().getRealPath(xmlPath));
+                                           envHome+"/"+xmlPath);
          } catch (Exception e) {
             e.printStackTrace();
          }
