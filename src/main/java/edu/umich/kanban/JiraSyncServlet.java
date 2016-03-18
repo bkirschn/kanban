@@ -21,12 +21,12 @@ public class JiraSyncServlet extends HttpServlet {
    private static final long serialVersionUID = 1L;
    private static Log M_log = LogFactory.getLog(JiraSyncServlet.class);
    private  Properties props = new Properties();
-   String envHome = System.getenv("PROPERTY_HOME");
+   String envHome = System.getenv("OPENSHIFT_DATA_DIR");
    
    public JiraSyncServlet() {
       try
       {
-         envHome = System.getenv("PROPERTY_HOME");
+         envHome = System.getenv("OPENSHIFT_DATA_DIR");
          if ( null == envHome )
             envHome = System.getenv("CATALINA_HOME");
          
