@@ -2,7 +2,9 @@ package edu.umich.kanban;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ResourceBundle;
+import java.io.FileInputStream;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -11,8 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import java.util.logging.Logger;
-
 
 /**
  * Servlet implementation class JiraSyncServlet
@@ -20,9 +20,22 @@ import java.util.logging.Logger;
 public class JiraSyncServlet extends HttpServlet {
    private static final long serialVersionUID = 1L;
    private static Log M_log = LogFactory.getLog(JiraSyncServlet.class);
-   
+   private  Properties props = new Properties();
    
    public JiraSyncServlet() {
+      try
+      {
+         String propertyHome = System.getenv("PROPERTY_HOME");
+         if ( null == propertyHome )
+            propertyHome = System.getenv("CATALINA_HOME");
+         
+         FileInputStream fis = new FileInputStream(propertyHome+"/jira.properties");
+         props.load( fis );
+      }
+      catch (Exception e)
+      {
+         e.printStackTrace();
+      }
    }
    
    /**
@@ -32,16 +45,15 @@ public class JiraSyncServlet extends HttpServlet {
       response.setContentType("text/html");
       PrintWriter out =response.getWriter();
       String queryString = request.getQueryString();
-      ResourceBundle props = ResourceBundle.getBundle("jira");
       
-      XmlMerge xmlMerge = new XmlMerge();
+      XmlMerge xmlMerge = new XmlMerge(props);
       
       // If queryString starts with ".", then it's a mergeFiles suffix
       if (queryString.startsWith(".")) {
          String mergeFiles="";
          try {
-            String xmlPath = props.getString("xml.path");
-            String xsltPath = props.getString("xslt.path");
+            String xmlPath = props.getProperty("xml.path");
+            String xsltPath = props.getProperty("xslt.path");
             mergeFiles=xmlMerge.mergeFiles(queryString, 
                                            getServletContext().getRealPath(xsltPath),
                                            getServletContext().getRealPath(xmlPath));
@@ -55,12 +67,12 @@ public class JiraSyncServlet extends HttpServlet {
       else if(queryString.equals("wip")) {
          StringBuilder jsonWip=new StringBuilder("[ {");
          jsonWip.append("\"todo\" : \"")
-            .append(props.getString("wip.todo"))
+            .append(props.getProperty("wip.todo"))
             .append("\"");
          jsonWip.append(", \"inprogress\" : \"");
-         jsonWip.append(props.getString("wip.inprogress")).append("\"");
+         jsonWip.append(props.getProperty("wip.inprogress")).append("\"");
          jsonWip.append(", \"review\" : \"");
-         jsonWip.append(props.getString("wip.review")).append("\"");
+         jsonWip.append(props.getProperty("wip.review")).append("\"");
          jsonWip.append("} ]");
          dataOutput(out, jsonWip.toString());
       }

@@ -10,7 +10,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ResourceBundle;
+import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,7 +30,12 @@ import org.xml.sax.InputSource;
 
 public class XmlMerge {
 
-   ResourceBundle props = ResourceBundle.getBundle("jira");
+   Properties props;
+   
+   public XmlMerge( Properties props )
+   {
+      this.props = props;
+   }
    
    /**
     ** Merge and transform the two JIRA XML file streams defined by the its.url and sakai.url
@@ -91,9 +96,9 @@ public class XmlMerge {
     **/
    private String queryJiraITS(String queryUrlSuffix) throws Exception {
       
-      String xmlFeed =props.getString("its.url"+queryUrlSuffix);
-      String name =props.getString("its.username");
-      String password = props.getString("its.password");
+      String xmlFeed =props.getProperty("its.url"+queryUrlSuffix);
+      String name =props.getProperty("its.username");
+      String password = props.getProperty("its.password");
       String authString=name+":"+password;
       byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
       String authStringEnc = new String(authEncBytes);
@@ -119,7 +124,7 @@ public class XmlMerge {
     **/
    private String queryJiraSakai(String queryUrlSuffix) throws Exception {
       
-      String xmlFeed = props.getString("sakai.url"+queryUrlSuffix);
+      String xmlFeed = props.getProperty("sakai.url"+queryUrlSuffix);
       URL url = new URL(xmlFeed);
       URLConnection urlConnection = url.openConnection();
       InputStream is = urlConnection.getInputStream();
