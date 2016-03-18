@@ -56,7 +56,7 @@ public class JiraSyncServlet extends HttpServlet {
             String xmlPath = props.getProperty("xml.path");
             String xsltPath = props.getProperty("xslt.path");
             mergeFiles=xmlMerge.mergeFiles(queryString, 
-                                           getServletContext().getRealPath(xsltPath),
+                                           envHome+"/"+xsltPath,
                                            envHome+"/"+xmlPath);
          } catch (Exception e) {
             e.printStackTrace();
